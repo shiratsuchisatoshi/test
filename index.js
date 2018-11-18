@@ -38,7 +38,7 @@ for ( let i=0; i<width; i++){
     }
 }
 
-
+// constでも書ける。letだとリセットしたときにボムカウントが0になってしまう。
 let BomCount = 10;   //★爆弾の数
 const BomPosition=[];//★爆弾の場所を格納用の配列
  
@@ -46,11 +46,11 @@ while(BomCount > 0) {
      
     BomCount--;
 
-    let i = Math.floor(Math.random() *9);
-    let j = Math.floor(Math.random() *9);
+    // let i = Math.floor(Math.random() *9);
+    // let j = Math.floor(Math.random() *9);
 
-    // let i = BomCount
-    // let j = BomCount
+    let i = BomCount
+    let j = BomCount
     board[i][j] = { hasBom: true, opened: false};
     BomPosition.push([i,j]);//★爆弾の場所を配列に格納★ 
 }
@@ -60,8 +60,8 @@ console.log(BomPosition);
 
 
 app.get('/board', (req ,res)=>{
-       
-    //urlのパラメーターを取得
+if (req.query.x){
+    // urlのパラメーターを取得
     let x= Number(req.query.x);
     let y= Number(req.query.y);
     let user = req.query.user;
@@ -105,7 +105,8 @@ app.get('/board', (req ,res)=>{
         }
 
     });
-
+}
+    //    }
     //   配列をコピー
     let str = JSON.stringify(board);
     let board2 = JSON.parse(str);
@@ -116,7 +117,7 @@ app.get('/board', (req ,res)=>{
             delete board2[i][j].hasBom;
         }
     }
-
+   
     res.json(board2);   
     console.log(board2);
   

@@ -4,11 +4,119 @@
         <meta charset="UTF-8">
     </head>
     <body>
-        <div id="app">node</div>
-        <style>
-        </style>
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-        <script>
+        <div id="app"></div>
+        
+<style>
+
+#app{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%)
+}
+
+.row{
+    overflow:hidden;
+}
+
+.block{
+    float:left;
+    width:30px;
+    height:30px;
+    border:1px solid #333;
+    background:#ddd;
+}
+
+.opened{
+    float:left;
+    width:30px;
+    height:30px;
+    border:1px solid #333;
+    background:white;
+}
+
+/* .Sprite{
+    width: 30px;
+    height:30px;
+    object-fit: cover;
+    object-position: -90px 
+} */
+
+
+
+</style>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+
+
+let imgArr=[];
+    for(i=0; i>=-420; i+=-30){
+        imgArr.push("<img style='object-fit: cover; object-position: "+i+"px' src='/img/img.png'>")
+    }
+console.log(imgArr);
+
+const render = (board2) => {
+  // DOMを破棄して再構築
+
+
+$("#app").empty();
+
+let html = '';
+
+    board2.forEach((row) =>{
+    html += '<div class="row">';
+        row.forEach((block) => {
+            const openedClass = block.opened ? "block opened" : "block close";
+            const userName = block.user || '';
+            const numberImg = imgArr[block.number-1];
+            const bomImg = block.exploded ?  imgArr[10] :'';
+
+            html +=`<div class="${openedClass}">${numberImg || bomImg}</div>`;
+        });
+
+        html+= '</div>';
+    });
+
+    $("#app").html(html);
+
+
+
+$('.block').click(function() {
+
+let index = $('.block').index(this);
+  
+  if (index <= 9) {
+    index ='0'+ index
+  } 
+ let num = index.toString();
+ let y= num.substring(0,1)
+ let x= num.substring(1)
+  console.log(x,y,this);
+  const user ='s';
+
+
+  $.getJSON('/board', {
+    // x: x,
+    // y: y,
+    // user: user,下と同じ書き方
+    x,
+    y,
+    user,
+  }, render);
+});
+
+}
+
+
+
+setInterval(() => {
+  // 0.5秒ごとにサーバーにポーリング
+  $.getJSON('/board', render);
+}, 500);
+
+
+
+
         </script>
     </body>
 </html>
