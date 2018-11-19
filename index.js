@@ -65,7 +65,10 @@ if (req.query.x){
     let x= Number(req.query.x);
     let y= Number(req.query.y);
     let user = req.query.user;
-        board[y][x]= { user:user ,opened: true }
+    let safeflag = req.query.safeflag;
+        board[y][x]= {safeflag:safeflag,user:user}
+        // board[y][x]= {safeflag:safeflag,user:user ,opened: true }
+
 
     //周辺の爆弾捜査
     let bomnum = 0;

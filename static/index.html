@@ -2,45 +2,39 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        <link rel="stylesheet" href="style.css">
+    
     </head>
     <body>
-        <div id="app"></div>
+            <div id="local"></div>
+            
+            
+        <div id="app" ></div>
         
+    
+<!-- モーダルウィンドウを開くボタン -->
+<div><a href="#modal01" class="modalOpen"></a></div>
+
+<!-- モーダルウィンドウ -->
+<div class="modal" id="modal01">
+
+    <!-- モーダルウィンドウが開いている時のオーバーレイ -->
+    <div class="overLay modalClose"></div>
+
+    <!-- モーダルウィンドウの中身 -->
+    <div class="inner">
+    user login
+        <form>
+            <input type="text" id="player" value="">
+            <input type="button" id="save" value=" login ">
+        </form>
+    </div>
+
+</div>
+
+
 <style>
 
-#app{
-    position:fixed;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%)
-}
-
-.row{
-    overflow:hidden;
-}
-
-.block{
-    float:left;
-    width:30px;
-    height:30px;
-    border:1px solid #333;
-    background:#ddd;
-}
-
-.opened{
-    float:left;
-    width:30px;
-    height:30px;
-    border:1px solid #333;
-    background:white;
-}
-
-/* .Sprite{
-    width: 30px;
-    height:30px;
-    object-fit: cover;
-    object-position: -90px 
-} */
 
 
 
@@ -49,11 +43,44 @@
 <script>
 
 
+
+
+
+
+
+
+
+let player = localStorage.player;  
+if(player){
+}
+else{
+    let href = $('.modalOpen').attr("href");
+    $(href).fadeIn();
+    }
+    $("#local").html("<p>Player1:"+player+"</p>");
+
+$("#save").click(function(){
+    let str= $("#player").val();
+    if( str==''){
+        alert('user名を入力してください');
+      
+    }else{
+  $(this).parents(".modal").fadeOut(); 
+  localStorage.setItem( "player" , str ); 
+  $("#local").html("<p>Player1:"+str+"</p>");
+    }
+    });  
+   
+
+    
+
 let imgArr=[];
     for(i=0; i>=-420; i+=-30){
         imgArr.push("<img style='object-fit: cover; object-position: "+i+"px' src='/img/img.png'>")
     }
 console.log(imgArr);
+
+
 
 const render = (board2) => {
   // DOMを破棄して再構築
@@ -70,8 +97,10 @@ let html = '';
             const userName = block.user || '';
             const numberImg = imgArr[block.number-1];
             const bomImg = block.exploded ?  imgArr[10] :'';
+            const flagImg = block.safeflag ?  imgArr[9] :'';
 
-            html +=`<div class="${openedClass}">${numberImg || bomImg}</div>`;
+            html +=`<div class="${openedClass}">${numberImg || bomImg || flagImg }</div>`;
+           
         });
 
         html+= '</div>';
@@ -81,33 +110,111 @@ let html = '';
 
 
 
-$('.block').click(function() {
+$('.block').mousedown(function(event) {
+    switch (event.which ) {
+        case 3:
+         if($(this).hasClass("close")){
+            let index = $('.block').index(this);
 
-let index = $('.block').index(this);
+if (index <= 9) {
+  index ='0'+ index
+} 
+let num = index.toString();
+let y= num.substring(0,1)
+let x= num.substring(1)
+const user =localStorage.player;
+const safeflag =true
+
+$.getJSON('/board', {
+  x,
+  y,
+  user,
+  safeflag,
   
-  if (index <= 9) {
-    index ='0'+ index
-  } 
- let num = index.toString();
- let y= num.substring(0,1)
- let x= num.substring(1)
-  console.log(x,y,this);
-  const user ='s';
+}, render);
+         }
+            break;
+        case 1:
+        let index = $('.block').index(this);
+
+if (index <= 9) {
+  index ='0'+ index
+} 
+let num = index.toString();
+let y= num.substring(0,1)
+let x= num.substring(1)
+//   console.log(x,y,this);
+const user =localStorage.player;
 
 
-  $.getJSON('/board', {
-    // x: x,
-    // y: y,
-    // user: user,下と同じ書き方
-    x,
-    y,
-    user,
-  }, render);
+$.getJSON('/board', {
+  // x: x,
+  // y: y,
+  // user: user,下と同じ書き方
+  x,
+  y,
+  user, 
+}, render);
+
+
+        
+            break;
+    }
 });
 
+// $('.block').bind('contextmenu',function(){
+// if ($(this).hasClass("close")) {
+//     let index = $('.block').index(this);
+
+//   if (index <= 9) {
+//     index ='0'+ index
+//   } 
+//  let num = index.toString();
+//  let y= num.substring(0,1)
+//  let x= num.substring(1)
+//  const user =localStorage.player;
+//  const safeflag =true
+
+//   $.getJSON('/board', {
+//     x,
+//     y,
+//     user,
+//     safeflag,
+    
+//   }, render);
+//   }
+//   return false 
+// });    
+
+
+
+// $('.block').click(function() {
+
+// let index = $('.block').index(this);
+
+//   if (index <= 9) {
+//     index ='0'+ index
+//   } 
+//  let num = index.toString();
+//  let y= num.substring(0,1)
+//  let x= num.substring(1)
+// //   console.log(x,y,this);
+//  const user =localStorage.player;
+
+
+//   $.getJSON('/board', {
+//     // x: x,
+//     // y: y,
+//     // user: user,下と同じ書き方
+//     x,
+//     y,
+//     user, 
+//   }, render);
+// });
+
+// }
+
 }
-
-
 
 setInterval(() => {
   // 0.5秒ごとにサーバーにポーリング
