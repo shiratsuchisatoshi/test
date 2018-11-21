@@ -5,225 +5,161 @@
         <link rel="stylesheet" href="style.css">
     
     </head>
-    <body>
-            <div id="local"></div>
-            
-            
-        <div id="app" ></div>
+<body>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+        <!-- player表示画面-->
+        <div id="top"></div>
+        <!-- ログアウトボタン-->
+        <input type="button" id="logout" value="log out ">
         
-    
-<!-- モーダルウィンドウを開くボタン -->
-<div><a href="#modal01" class="modalOpen"></a></div>
 
-<!-- モーダルウィンドウ -->
-<div class="modal" id="modal01">
-
-    <!-- モーダルウィンドウが開いている時のオーバーレイ -->
-    <div class="overLay modalClose"></div>
-
-    <!-- モーダルウィンドウの中身 -->
-    <div class="inner">
-    user login
-        <form>
-            <input type="text" id="player" value="">
-            <input type="button" id="save" value=" login ">
-        </form>
-    </div>
-
-</div>
+        <!-- マインスイーパー表示領域-->
+        <div id="app"></div>
 
 
-<style>
+        <!-- ログインウィンドウ-->
+        <div class="modal" id="modal01">
+            <!-- ログインウィンドウが開いている時のグレーの背景 -->
+            <div class="overLay"></div>
+                <!-- ログインウィンドウの中身 -->
+                <div class="inner">
+                    player login
+                    <form>
+                        <input type="text" id="player" value="">
+                        <input type="button" id="login" value=" login ">
+                    </form>
+                </div> 
+        </div>
 
 
+        
+
+    <script>
+
+        let player = localStorage.player;  
+
+        // ローカルストレージにplayerがいなければログイン画面を表示
+        if(player){
+        }
+        else{
+            $("#modal01").fadeIn();  // ログイン画面タグをfadeinする
+        }
+        $("#top").html("<p>Player1:"+player+"</p>");
 
 
-</style>
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script>
-
-
-
-
-
-
-
-
-
-let player = localStorage.player;  
-if(player){
-}
-else{
-    let href = $('.modalOpen').attr("href");
-    $(href).fadeIn();
-    }
-    $("#local").html("<p>Player1:"+player+"</p>");
-
-$("#save").click(function(){
-    let str= $("#player").val();
-    if( str==''){
-        alert('user名を入力してください');
-      
-    }else{
-  $(this).parents(".modal").fadeOut(); 
-  localStorage.setItem( "player" , str ); 
-  $("#local").html("<p>Player1:"+str+"</p>");
-    }
-    });  
-   
-
-    
-
-let imgArr=[];
-    for(i=0; i>=-420; i+=-30){
-        imgArr.push("<img style='object-fit: cover; object-position: "+i+"px' src='/img/img.png'>")
-    }
-console.log(imgArr);
-
-
-
-const render = (board2) => {
-  // DOMを破棄して再構築
-
-
-$("#app").empty();
-
-let html = '';
-
-    board2.forEach((row) =>{
-    html += '<div class="row">';
-        row.forEach((block) => {
-            const openedClass = block.opened ? "block opened" : "block close";
-            const userName = block.user || '';
-            const numberImg = imgArr[block.number-1];
-            const bomImg = block.exploded ?  imgArr[10] :'';
-            const flagImg = block.safeflag ?  imgArr[9] :'';
-
-            html +=`<div class="${openedClass}">${numberImg || bomImg || flagImg }</div>`;
-           
+        // ログイン画面でloginボタン押下時のイベント    
+        $("#login").click(function(){
+            let player= $("#player").val();
+                if( player == ''){ //player名をブランクのままの場合（ログイン失敗時）
+                    alert('player名を入力してください'); 
+                }else{ // ログイン成功時
+                    $(this).parents(".modal").fadeOut(); // ログイン画面タグをfadeoutする
+                    localStorage.setItem( "player" , player ); 
+                    $("#top").html("<p>Player1:"+player+"</p>");
+                }
+        });  
+        
+        // logoutボタン押下時のイベント
+        $("#logout").click(function(){
+            localStorage.clear(); // ローカルストレージからplayer削除
+            $("#top").html("<p>Player1:</p>");
+            $("#modal01").fadeIn();
         });
 
-        html+= '</div>';
-    });
 
-    $("#app").html(html);
-
-
-
-$('.block').mousedown(function(event) {
-    switch (event.which ) {
-        case 3:
-         if($(this).hasClass("close")){
-            let index = $('.block').index(this);
-
-if (index <= 9) {
-  index ='0'+ index
-} 
-let num = index.toString();
-let y= num.substring(0,1)
-let x= num.substring(1)
-const user =localStorage.player;
-const safeflag =true
-
-$.getJSON('/board', {
-  x,
-  y,
-  user,
-  safeflag,
-  
-}, render);
-         }
-            break;
-        case 1:
-        let index = $('.block').index(this);
-
-if (index <= 9) {
-  index ='0'+ index
-} 
-let num = index.toString();
-let y= num.substring(0,1)
-let x= num.substring(1)
-//   console.log(x,y,this);
-const user =localStorage.player;
-
-
-$.getJSON('/board', {
-  // x: x,
-  // y: y,
-  // user: user,下と同じ書き方
-  x,
-  y,
-  user, 
-}, render);
-
-
-        
-            break;
-    }
-});
-
-// $('.block').bind('contextmenu',function(){
-// if ($(this).hasClass("close")) {
-//     let index = $('.block').index(this);
-
-//   if (index <= 9) {
-//     index ='0'+ index
-//   } 
-//  let num = index.toString();
-//  let y= num.substring(0,1)
-//  let x= num.substring(1)
-//  const user =localStorage.player;
-//  const safeflag =true
-
-//   $.getJSON('/board', {
-//     x,
-//     y,
-//     user,
-//     safeflag,
-    
-//   }, render);
-//   }
-//   return false 
-// });    
+        // 画像をスプライト表示用に配列格納
+        let imgArr=[];
+            for(i=0; i>=-420; i+=-30){
+                imgArr.push("<img style='object-fit: cover; object-position: "+i+"px' src='/img/img.png'>")
+            }
+            console.log(imgArr);
 
 
 
-// $('.block').click(function() {
+        const  render = (board2) => {
+        // DOMを破棄して再構築
 
-// let index = $('.block').index(this);
+            $("#app").empty();
+                let html = '';
 
-//   if (index <= 9) {
-//     index ='0'+ index
-//   } 
-//  let num = index.toString();
-//  let y= num.substring(0,1)
-//  let x= num.substring(1)
-// //   console.log(x,y,this);
-//  const user =localStorage.player;
+                    board2.forEach((row) =>{
+                        html += '<div class="row">';
+                            row.forEach((block) => {
+                                const openedClass = block.opened ? "block opened" : "block close";
+                                const userName = block.user || '';
+                                const numberImg = imgArr[block.number-1];
+                                const bomImg = block.exploded ?  imgArr[10] :'';
+                                const flagImg = block.safeflag ?  imgArr[9] :'';
+                            
+                                    if(block.safeflag == 'true' || block.safeflag == true){
+                                        html +=`<div class="block close">${flagImg}</div>`;
+                                    }else if(block.exploded == true){
+                                        html +=`<div class="${openedClass}">${bomImg}</div>`;
+                                    }else{
+                                        html +=`<div class="${openedClass}">${numberImg || ''}</div>`;
+                                    }
+                            });
+                        html+= '</div>';
+                    });
 
-
-//   $.getJSON('/board', {
-//     // x: x,
-//     // y: y,
-//     // user: user,下と同じ書き方
-//     x,
-//     y,
-//     user, 
-//   }, render);
-// });
-
-// }
-
-}
-
-setInterval(() => {
-  // 0.5秒ごとにサーバーにポーリング
-  $.getJSON('/board', render);
-}, 500);
+            $("#app").html(html);
 
 
+            // クリックイベント
+            $('.block').mousedown(function(e) {
+
+                const x = $(this).index();
+                const y = $(this).parent('.row').index();
+                const user = localStorage.player;
+                        
+                    switch (e.which) {
+                        case 1: // 1は左クリック
+                            let safeflag = false;
+                            getJSON(x,y,user,safeflag); //  関数化したgetJSONの呼び出し
+                            break;
+                            
+                        case 3: // 3は右クリック
+                            if ($(this).hasClass("close")) {  
+                                let safeflag = true;
+                                getJSON(x,y,user,safeflag);
+                                return false;
+                            } 
+                            break;    
+                    }
+                    
+            });
+
+        }
 
 
-        </script>
-    </body>
+        setInterval(() => {
+        // 0.5秒ごとにサーバーにポーリング
+        $.getJSON('/board', render);
+        }, 500);
+
+
+
+        // getJSONの処理を関数化
+        function getJSON(x,y,user,safeflag){
+            $.getJSON('/board', {
+                    x,     // x: x,
+                    y,     // y: y,
+                    user,  // user: user,と同じ書き方
+                    safeflag,
+            }, render);
+        }
+
+
+        // マインスイーパーの表示領域で右クリック時メニュー非表示
+        $(function(){
+            $("#app").on('contextmenu',function(){
+                return false;
+            });
+        });
+
+
+     </script>
+   
+</body>
 </html>

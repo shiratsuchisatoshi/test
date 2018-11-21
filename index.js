@@ -56,19 +56,29 @@ while(BomCount > 0) {
 }
 
 //爆弾の座標確認用 
-console.log(BomPosition);
+// console.log(BomPosition);
 
 
 app.get('/board', (req ,res)=>{
 if (req.query.x){
+    
     // urlのパラメーターを取得
+    // queryは文字列で飛んでくる
     let x= Number(req.query.x);
     let y= Number(req.query.y);
     let user = req.query.user;
     let safeflag = req.query.safeflag;
-        board[y][x]= {safeflag:safeflag,user:user}
-        // board[y][x]= {safeflag:safeflag,user:user ,opened: true }
 
+        if(safeflag=='true'){
+            board[y][x].safeflag = safeflag
+            board[y][x].user = user
+        }else{
+            board[y][x].safeflag = safeflag
+            board[y][x].user = user
+            board[y][x].opened = true 
+        }
+        
+   
 
     //周辺の爆弾捜査
     let bomnum = 0;
@@ -81,34 +91,44 @@ if (req.query.x){
         let d = x+b;
 
             if(c>=0 && c<=9 && d>=0 && d<=9){
-                if(board[c][d].hasBom === true){ 
+                if(board[c][d].hasBom===true){ 
                     bomnum++;
                 }
                 board[y][x].number = bomnum;
             }   
     });
    
-
+// ★爆発判定処理★
     let count = 0; // もしどこかでexploded: trueになったときにカウントされる
 
     // 開いた座標に爆弾があるか確認
     BomPosition.map(( value, index, arr )=>{
-        if(board[y][x]==board[arr[index][0]][arr[index][1]]){
-            board[arr[index][0]][arr[index][1]]= { exploded: true,opened: true };
-                count++;
-                    delete arr[index];// 開いた座標を配列から削除（その他の誘爆に巻き込まれないため）
+        // 旗が設置してあったときの処理
+        if(board[y][x] == board[arr[index][0]][arr[index][1]] && board[y][x].safeflag==='true'){
+            board[y][x].safeflag = true;  
         }
-
+        // 開いた箇所に爆弾があったときの処理
+        if(board[y][x] == board[arr[index][0]][arr[index][1]] && board[y][x].safeflag==='false'){
+            board[y][x].exploded = true;
+            board[y][x].opened = true;
+            count++;
+            delete arr[index];// 開いた座標を配列から削除（その他の誘爆に巻き込まれないため）
+        }
          //もしどこかでexploded: trueになった場合（カウントが1になった場合）、ほかの爆弾も爆発
         if(count==1){
             BomPosition.map(( value, index, arr )=>{
-                board[arr[index][0]][arr[index][1]]= { exploded: true,opened: false };
+                board[arr[index][0]][arr[index][1]].exploded = true;
+                board[arr[index][0]][arr[index][1]].opened = false;
+                board[arr[index][0]][arr[index][1]].safeflag = false;
             })
             count=0; // カウントを0に戻す
         }
-
     });
+
+
 }
+
+
     //    }
     //   配列をコピー
     let str = JSON.stringify(board);
@@ -122,8 +142,8 @@ if (req.query.x){
     }
    
     res.json(board2);   
-    console.log(board2);
-  
+    // console.log(board2);
+    // console.log(req.query.safeflag);
 });
 
 
