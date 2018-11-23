@@ -94,10 +94,90 @@ if (req.query.x){
                 if(board[c][d].hasBom===true){ 
                     bomnum++;
                 }
-                board[y][x].number = bomnum;
-            }   
+                 board[y][x].number = bomnum;
+            }     
     });
-   
+
+
+    // if(board[y][x].number == 0 ){
+    //     chain(x,y);
+    // }  
+
+    function chain(x,y){
+        for(let mi=-1; mi<=1; mi++){
+            for(let mj=-1; mj<=1; mj++){
+                chain2(x,y,mi,mj);
+                // console.log('X=',x,'y=',y,'mi=',mi,'mj=',mj);
+            }
+        }
+    };
+
+
+    function chain2(x,y,mi,mj){
+        let boms=0;
+          y= y + mi;
+          x= x + mj;
+          board[y][x].opened=true
+        // // console.log('X=',x,'y=',y);
+        // if(y>=0 && y<=9 && x>=0 && x<=9){
+            around.map(( value, index, array )=>{
+
+                let a = array[index][0];
+                let b = array[index][1];
+                let c = y+a;
+                let d = x+b;
+        
+                    if(c>=0 && c<=9 && d>=0 && d<=9){
+                        if(board[c][d].hasBom===true){ 
+                            boms++;
+                        }
+                         board[y][x].number = boms;     
+                    }
+            });
+
+            if(board[y][x].number == 0 ){
+                console.log('X=',x,'y=',y);
+                chain(x,y);
+            } 
+
+    }   
+            
+           
+        
+             
+
+    //     if(board[y][x].safeflag =='false'){ 
+            
+    //         board[y][x].opened = true
+    //     }
+                
+    //     if(y==1&& x==8){ 
+    //         console.log('OK');
+      
+    // } 
+ 
+    // console.log('X=',x,'y=',y);
+
+    
+
+
+    // if(c>=0 && c<=9 && d>=0 && d<=9){
+    //     if(board[c][d].opened === false && board[y][x].safeflag =='false'){ 
+            
+    //         board[c][d].opened = true
+    //         board[y][x].number = bomnum;
+        
+    //     }
+
+
+    //     }
+     
+
+
+
+
+
+
 // ★爆発判定処理★
     let count = 0; // もしどこかでexploded: trueになったときにカウントされる
 
@@ -141,10 +221,15 @@ if (req.query.x){
         }
     }
    
-    res.json(board2);   
+    res.json(board2);
     // console.log(board2);
-    // console.log(req.query.safeflag);
+   
+    
 });
 
 
 app.listen(8000);
+
+
+
+
