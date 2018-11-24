@@ -104,7 +104,7 @@ if (req.query.x){
     // }  
 
     function chain(x,y){
-        for(let mi=-1; mi<=1; mi++){
+        for(let mi=-1; mi<=1; mi++){n
             for(let mj=-1; mj<=1; mj++){
                 chain2(x,y,mi,mj);
                 // console.log('X=',x,'y=',y,'mi=',mi,'mj=',mj);
