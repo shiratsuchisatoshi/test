@@ -46,11 +46,11 @@ while(BomCount > 0) {
      
     BomCount--;
 
-    // let i = Math.floor(Math.random() *9);
-    // let j = Math.floor(Math.random() *9);
+    let i = Math.floor(Math.random() *9);
+    let j = Math.floor(Math.random() *9);
 
-    let i = BomCount
-    let j = BomCount
+    // let i = BomCount
+    // let j = BomCount
     board[i][j] = { hasBom: true, opened: false};
     BomPosition.push([i,j]);//★爆弾の場所を配列に格納★ 
 }
@@ -81,227 +81,159 @@ if (req.query.x){
    
 
     //周辺の爆弾捜査
-    let bomnum = 0;
+    bomsearch(x,y);
 
-    around.map(( value, index, array )=>{
-
-        let a = array[index][0];
-        let b = array[index][1];
-        let c = y+a;
-        let d = x+b;
-
-            if(c>=0 && c<=9 && d>=0 && d<=9){
-                if(board[c][d].hasBom===true){ 
-                    bomnum++;
-                }
-                 board[y][x].number = bomnum;
-            }     
-    });
-
-    // const around =[
-    //     [-1,-1],
-    //     [0,-1],
-    //     [1,-1],
-    //     [1,0],
-    //     [1,1],
-    //     [0,1],
-    //     [-1,1],
-    //     [-1,0],
   
 
     if(board[y][x].number == 0 ){
+        let n=0;
+        let n2=0;
+        let n3=0;
+        let n4=0;
         
-        chain(x,y);
+        while(n <=9-x) {
+            console.log("x",x)
+            board[y][x+n].opened = true;
+             bomsearch(x+n,y);
+             
+             if(board[y][x+n].number == 0 ){
+                while(n2 <=9-y) {
+                    console.log("y",y+n2)
+                    board[y+n2][x+n].opened = true;
+                     bomsearch(x+n,y+n2);
+                    if(board[y+n2][x+n].number==true){
+                        n2=0;
+                        break;
+                    }
+                    n2++;
+                }
+                n2=0;
+             }
+        if(board[y][x+n].number==true){
+            break;
+        }
+    n++;
+}
+
+
+    
+
+    while(0 <= x-n3) {
+        board[y][x-n3].opened = true;
+        bomsearch(x-n3,y);
+       
+            if(board[y][x-n3].number == 0 ){
+                while(n4 <=9-y) {
+                    console.log("y",y+n2)
+                    board[y+n4][x-n3].opened = true;
+                    bomsearch(x-n3,y+n4);
+                        if(board[y+n4][x-n3].number==true){
+                            n4=0;
+                            break;
+                        }
+                    n4++;
+                }
+                n4=0;
+            }
+        
+        // console.log(n3);
+        if(board[y][x-n3].number==true){
+            break;
+        }
+        n3++;
+    }
+
+
+
+        
     }  
 
-//  function chain(x,y){
-//         for(let mi=-1; mi<=1; mi++){
-//             for(let mj=-1; mj<=1; mj++){
-//                 chain2(x,y,mi,mj);
-//                 console.log('X=',x,'y=',y,'mi=',mi,'mj=',mj);
-//             }
+   
+
+
+
+
+//   function chain(x,y){
+
+//     for ( let i=-1; i<=1; i++){ 
+//         for ( let j=-1; j<=1; j++){ 
+//             chain2(x,y,i,j)   
 //         }
-//     };
-
-
-
-  function chain(x,y){
-        // let boms = 0;
-        let n = 0;
-       
-    
-        while(n<10){
-
-            // for(let mi=-1; mi<=1; mi+=2){
-            //     for(let mj=-1; mj<=1; mj+=2){
-            //         console.log('X=',x,'y=',y,'mi=',mi,'mj=',mj);
-            //     }
-            // }
-
-            // let around2 =  [
-            //     [x-1, y-1],
-            //     [x+1, y-1],
-            //     [x-1, y+1],
-            //     [x+1, y+1],
-            // ];
-            // console.log(l+'回目',around2);
-            let around2 = [
-                        [x, y - n],
-                        [x, y + n],
-                        [x - n, y - n],
-                        [x - n, y], 
-                        [x - n, y + n], 
-                        [x + n, y - n], 
-                        [x + n, y], 
-                        [x + n, y + n]
-                    ];
-                    
-
-                    around2.map(( value, index, array2 )=>{
-                                    
-                                let e = array2[index][0];
-                                let f = array2[index][1];
-                                
-                                // let g = c+e;
-                                // let h =d+f;
-                                const directions =[
-                                    [-1,-1],
-                                    [0,-1],
-                                    [1,-1],
-                                    [1,0],
-                                    [1,1],
-                                    [0,1],
-                                    [-1,1],
-                                    [-1,0],
-                                ];
-                          
-                        if(e>=0 && e<=9 && f>=0 && f<=9){   
-                            board[f][e].opened=true
-                           
-                          
-                                let bomnum = 0;
-
-                                directions.map(( value, index, array )=>{
-
-                                    let a = array[index][0];
-                                    let b = array[index][1];
-                                    let c = f+a;
-                                    let d = e+b;
-
-                                        if(c>=0 && c<=9 && d>=0 && d<=9){
-                                            if(board[c][d].hasBom===true){ 
-                                                bomnum++;
-                                            }
-                                            board[f][e].number = bomnum;
-                                        }     
-                                
-                                    console.log('around3',around2);
-                                });
-                        }
-            }
-            
-                    )};   
-        n++ 
-    }   
-
-
-
-
+//     }
+//   }
 
   
+//   function chain2(x,y,i,j){
+//       x=x+i
+//       y=y+j
+//     //   console.log(x,y)
+//       if(x>=0 && x<=9 && y>=0 && y<=9){
+//         board[y][x].opened=true;
+
+//         bomsearch(x,y);
+//         console.log(y,x);
+//                 // if(board[y][x].number==0){
+//                 //     chain(x,y);
+//                 // }
+//         }
+//   }
 
 
 
 
-        // while(x<10){
-        //     if(x<0 || x>9){
-        //         break;
-        //     }
-            // console.log(x);
-           
-            // if(boms!=0){
-            //     break;
-            // }
-            // boms=0;
-            // x++;
-        
+    function bomsearch(x,y){
+             let bomnum = 0;
 
-
-
-    // function chain(x,y){
-    //     for(let mi=-1; mi<=1; mi++){n
-    //         for(let mj=-1; mj<=1; mj++){
-    //             chain2(x,y,mi,mj);
-    //             // console.log('X=',x,'y=',y,'mi=',mi,'mj=',mj);
-    //         }
-    //     }
-    // };
-
-
-
-    // function chain2(x,y,mi,mj){
-    //     let boms=0;
-    //       y= y + mi;
-    //       x= x + mj;
-    //       board[y][x].opened=true
-    //     // // console.log('X=',x,'y=',y);
-    //     // if(y>=0 && y<=9 && x>=0 && x<=9){
-    //         around.map(( value, index, array )=>{
-
-    //             let a = array[index][0];
-    //             let b = array[index][1];
-    //             let c = y+a;
-    //             let d = x+b;
-        
-    //                 if(c>=0 && c<=9 && d>=0 && d<=9){
-    //                     if(board[c][d].hasBom===true){ 
-    //                         boms++;
-    //                     }
-    //                      board[y][x].number = boms;     
-    //                 }
-    //         });
-
-    //         if(board[y][x].number == 0 ){
-    //             console.log('X=',x,'y=',y);
-    //             chain(x,y);
-    //         } 
-
-    // }   
+                around.map(( value, index, array )=>{
             
-
-
-
-
-// ★爆発判定処理★
-    let count = 0; // もしどこかでexploded: trueになったときにカウントされる
-
-    // 開いた座標に爆弾があるか確認
-    BomPosition.map(( value, index, arr )=>{
-        // 旗が設置してあったときの処理
-        if(board[y][x] == board[arr[index][0]][arr[index][1]] && board[y][x].safeflag==='true'){
-            board[y][x].safeflag = true;  
-        }
-        // 開いた箇所に爆弾があったときの処理
-        if(board[y][x] == board[arr[index][0]][arr[index][1]] && board[y][x].safeflag==='false'){
-            board[y][x].exploded = true;
-            board[y][x].opened = true;
-            count++;
-            delete arr[index];// 開いた座標を配列から削除（その他の誘爆に巻き込まれないため）
-        }
-         //もしどこかでexploded: trueになった場合（カウントが1になった場合）、ほかの爆弾も爆発
-        if(count==1){
-            BomPosition.map(( value, index, arr )=>{
-                board[arr[index][0]][arr[index][1]].exploded = true;
-                board[arr[index][0]][arr[index][1]].opened = false;
-                board[arr[index][0]][arr[index][1]].safeflag = false;
-            })
-            count=0; // カウントを0に戻す
-        }
+                    let a = array[index][0];
+                    let b = array[index][1];
+                    let c = y+a;
+                    let d = x+b;
+            
+                        if(c>=0 && c<=9 && d>=0 && d<=9){
+                            if(board[c][d].hasBom===true){ 
+                                bomnum++;
+                            }
+                            board[y][x].number = bomnum;
+            }     
     });
-
 
 }
 
+
+
+        // ★爆発判定処理★
+        let count = 0; // もしどこかでexploded: trueになったときにカウントされる
+
+        // 開いた座標に爆弾があるか確認
+        BomPosition.map(( value, index, arr )=>{
+            // 旗が設置してあったときの処理
+            if(board[y][x] == board[arr[index][0]][arr[index][1]] && board[y][x].safeflag==='true'){
+                board[y][x].safeflag = true;  
+            }
+            // 開いた箇所に爆弾があったときの処理
+            if(board[y][x] == board[arr[index][0]][arr[index][1]] && board[y][x].safeflag==='false'){
+                board[y][x].exploded = true;
+                board[y][x].opened = true;
+                count++;
+                delete arr[index];// 開いた座標を配列から削除（その他の誘爆に巻き込まれないため）
+            }
+            //もしどこかでexploded: trueになった場合（カウントが1になった場合）、ほかの爆弾も爆発
+            if(count==1){
+                BomPosition.map(( value, index, arr )=>{
+                    board[arr[index][0]][arr[index][1]].exploded = true;
+                    board[arr[index][0]][arr[index][1]].opened = false;
+                    board[arr[index][0]][arr[index][1]].safeflag = false;
+                })
+                count=0; // カウントを0に戻す
+            }
+        });
+
+
+    }
+
+        
 
     //    }
     //   配列をコピー
@@ -323,7 +255,3 @@ if (req.query.x){
 
 
 app.listen(8000);
-
-
-
-
