@@ -98,82 +98,176 @@ if (req.query.x){
             }     
     });
 
+    // const around =[
+    //     [-1,-1],
+    //     [0,-1],
+    //     [1,-1],
+    //     [1,0],
+    //     [1,1],
+    //     [0,1],
+    //     [-1,1],
+    //     [-1,0],
+  
 
-    // if(board[y][x].number == 0 ){
-    //     chain(x,y);
-    // }  
-
-    function chain(x,y){
-        for(let mi=-1; mi<=1; mi++){n
-            for(let mj=-1; mj<=1; mj++){
-                chain2(x,y,mi,mj);
-                // console.log('X=',x,'y=',y,'mi=',mi,'mj=',mj);
-            }
-        }
-    };
-
-
-    function chain2(x,y,mi,mj){
-        let boms=0;
-          y= y + mi;
-          x= x + mj;
-          board[y][x].opened=true
-        // // console.log('X=',x,'y=',y);
-        // if(y>=0 && y<=9 && x>=0 && x<=9){
-            around.map(( value, index, array )=>{
-
-                let a = array[index][0];
-                let b = array[index][1];
-                let c = y+a;
-                let d = x+b;
+    if(board[y][x].number == 0 ){
         
-                    if(c>=0 && c<=9 && d>=0 && d<=9){
-                        if(board[c][d].hasBom===true){ 
-                            boms++;
-                        }
-                         board[y][x].number = boms;     
-                    }
-            });
+        chain(x,y);
+    }  
 
-            if(board[y][x].number == 0 ){
-                console.log('X=',x,'y=',y);
-                chain(x,y);
-            } 
+//  function chain(x,y){
+//         for(let mi=-1; mi<=1; mi++){
+//             for(let mj=-1; mj<=1; mj++){
+//                 chain2(x,y,mi,mj);
+//                 console.log('X=',x,'y=',y,'mi=',mi,'mj=',mj);
+//             }
+//         }
+//     };
 
-    }   
-            
-           
-        
-             
 
-    //     if(board[y][x].safeflag =='false'){ 
-            
-    //         board[y][x].opened = true
-    //     }
-                
-    //     if(y==1&& x==8){ 
-    //         console.log('OK');
-      
-    // } 
- 
-    // console.log('X=',x,'y=',y);
 
+  function chain(x,y){
+        // let boms = 0;
+        let n = 0;
+       
     
+        while(n<10){
 
+            // for(let mi=-1; mi<=1; mi+=2){
+            //     for(let mj=-1; mj<=1; mj+=2){
+            //         console.log('X=',x,'y=',y,'mi=',mi,'mj=',mj);
+            //     }
+            // }
 
-    // if(c>=0 && c<=9 && d>=0 && d<=9){
-    //     if(board[c][d].opened === false && board[y][x].safeflag =='false'){ 
+            // let around2 =  [
+            //     [x-1, y-1],
+            //     [x+1, y-1],
+            //     [x-1, y+1],
+            //     [x+1, y+1],
+            // ];
+            // console.log(l+'回目',around2);
+            let around2 = [
+                        [x, y - n],
+                        [x, y + n],
+                        [x - n, y - n],
+                        [x - n, y], 
+                        [x - n, y + n], 
+                        [x + n, y - n], 
+                        [x + n, y], 
+                        [x + n, y + n]
+                    ];
+                    
+
+                    around2.map(( value, index, array2 )=>{
+                                    
+                                let e = array2[index][0];
+                                let f = array2[index][1];
+                                
+                                // let g = c+e;
+                                // let h =d+f;
+                                const directions =[
+                                    [-1,-1],
+                                    [0,-1],
+                                    [1,-1],
+                                    [1,0],
+                                    [1,1],
+                                    [0,1],
+                                    [-1,1],
+                                    [-1,0],
+                                ];
+                          
+                        if(e>=0 && e<=9 && f>=0 && f<=9){   
+                            board[f][e].opened=true
+                           
+                          
+                                let bomnum = 0;
+
+                                directions.map(( value, index, array )=>{
+
+                                    let a = array[index][0];
+                                    let b = array[index][1];
+                                    let c = f+a;
+                                    let d = e+b;
+
+                                        if(c>=0 && c<=9 && d>=0 && d<=9){
+                                            if(board[c][d].hasBom===true){ 
+                                                bomnum++;
+                                            }
+                                            board[f][e].number = bomnum;
+                                        }     
+                                
+                                    console.log('around3',around2);
+                                });
+                        }
+            }
             
-    //         board[c][d].opened = true
-    //         board[y][x].number = bomnum;
+                    )};   
+        n++ 
+    }   
+
+
+
+
+
+  
+
+
+
+
+        // while(x<10){
+        //     if(x<0 || x>9){
+        //         break;
+        //     }
+            // console.log(x);
+           
+            // if(boms!=0){
+            //     break;
+            // }
+            // boms=0;
+            // x++;
         
+
+
+
+    // function chain(x,y){
+    //     for(let mi=-1; mi<=1; mi++){n
+    //         for(let mj=-1; mj<=1; mj++){
+    //             chain2(x,y,mi,mj);
+    //             // console.log('X=',x,'y=',y,'mi=',mi,'mj=',mj);
+    //         }
     //     }
+    // };
 
 
-    //     }
-     
 
+    // function chain2(x,y,mi,mj){
+    //     let boms=0;
+    //       y= y + mi;
+    //       x= x + mj;
+    //       board[y][x].opened=true
+    //     // // console.log('X=',x,'y=',y);
+    //     // if(y>=0 && y<=9 && x>=0 && x<=9){
+    //         around.map(( value, index, array )=>{
 
+    //             let a = array[index][0];
+    //             let b = array[index][1];
+    //             let c = y+a;
+    //             let d = x+b;
+        
+    //                 if(c>=0 && c<=9 && d>=0 && d<=9){
+    //                     if(board[c][d].hasBom===true){ 
+    //                         boms++;
+    //                     }
+    //                      board[y][x].number = boms;     
+    //                 }
+    //         });
+
+    //         if(board[y][x].number == 0 ){
+    //             console.log('X=',x,'y=',y);
+    //             chain(x,y);
+    //         } 
+
+    // }   
+            
 
 
 
