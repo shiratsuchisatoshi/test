@@ -46,11 +46,11 @@ while(BomCount > 0) {
      
     BomCount--;
 
-    let i = Math.floor(Math.random() *9);
-    let j = Math.floor(Math.random() *9);
+    // let i = Math.floor(Math.random() *9);
+    // let j = Math.floor(Math.random() *9);
 
-    // let i = BomCount
-    // let j = BomCount
+    let i = BomCount
+    let j = BomCount
     board[i][j] = { hasBom: true, opened: false};
     BomPosition.push([i,j]);//★爆弾の場所を配列に格納★ 
 }
@@ -78,114 +78,63 @@ if (req.query.x){
             board[y][x].opened = true 
         }
         
-   
-
-    //周辺の爆弾捜査
-    bomsearch(x,y);
-
-  
-
-    if(board[y][x].number == 0 ){
-        let n=0;
-        let n2=0;
-        let n3=0;
-        let n4=0;
-        
-        while(n <=9-x) {
-            console.log("x",x)
-            board[y][x+n].opened = true;
-             bomsearch(x+n,y);
-             
-             if(board[y][x+n].number == 0 ){
-                while(n2 <=9-y) {
-                    console.log("y",y+n2)
-                    board[y+n2][x+n].opened = true;
-                     bomsearch(x+n,y+n2);
-                    if(board[y+n2][x+n].number==true){
-                        n2=0;
-                        break;
-                    }
-                    n2++;
-                }
-                n2=0;
-             }
-        if(board[y][x+n].number==true){
-            break;
+   //クリックした箇所にsafeflagがなかった場合は座標周辺の爆弾捜査
+    if(safeflag=='false'){
+        bomnum = bomsearch(y,x);
+        board[y][x].number = bomnum;  
         }
-    n++;
-}
 
 
-    
-
-    while(0 <= x-n3) {
-        board[y][x-n3].opened = true;
-        bomsearch(x-n3,y);
-       
-            if(board[y][x-n3].number == 0 ){
-                while(n4 <=9-y) {
-                    console.log("y",y+n2)
-                    board[y+n4][x-n3].opened = true;
-                    bomsearch(x-n3,y+n4);
-                        if(board[y+n4][x-n3].number==true){
-                            n4=0;
-                            break;
-                        }
-                    n4++;
-                }
-                n4=0;
+    //フィールド全体をsetIntervalで確認。0が開かれている箇所があれば周囲捜索を行う
+    // setIntervalでなければ非同期処理のためか途中で０連鎖が止まってしまう。
+    setInterval(() => {
+        for ( let i=0; i<width; i++){ 
+            for ( let j=0; j<height; j++){ 
+                if(board[i][j].number == 0 && board[i][j].hasBom == false){ 
+                    zerochain(i,j)
+                }   
             }
-        
-        // console.log(n3);
-        if(board[y][x-n3].number==true){
-            break;
         }
-        n3++;
-    }
+        }, 0);
 
 
+        // for ( let i=0; i<width; i++){ 
+        //     for ( let j=0; j<height; j++){ 
+        //         if(board[i][j].number == 0 && board[i][j].hasBom == false){ 
+        //             zerochain(i,j)
+        //         }   
+        //     }
+        // }
 
-        
+
+    // if(board[y][x].number == 0 ){
+    //     chain(y,x)
+    // }
+
+
+    // 開いた座標が0であったときの0連鎖の関数処理
+    function zerochain(y,x){
+
+        for ( let i=-1; i<=1; i++){ 
+            for ( let j=-1; j<=1; j++){ 
+                x2=x+j
+                y2=y+i
+
+                if(x2>=0 && x2<=9 && y2>=0 && y2<=9){
+                    board[y2][x2].opened = true;
+                    bomnum = bomsearch(y2,x2);
+                    board[y2][x2].number = bomnum;
+                    // console.log(bomnum);
+                    }   
+            }   
+        }
     }  
 
-   
-
-
-
-
-//   function chain(x,y){
-
-//     for ( let i=-1; i<=1; i++){ 
-//         for ( let j=-1; j<=1; j++){ 
-//             chain2(x,y,i,j)   
-//         }
-//     }
-//   }
-
-  
-//   function chain2(x,y,i,j){
-//       x=x+i
-//       y=y+j
-//     //   console.log(x,y)
-//       if(x>=0 && x<=9 && y>=0 && y<=9){
-//         board[y][x].opened=true;
-
-//         bomsearch(x,y);
-//         console.log(y,x);
-//                 // if(board[y][x].number==0){
-//                 //     chain(x,y);
-//                 // }
-//         }
-//   }
-
-
-
-
-    function bomsearch(x,y){
+    function bomsearch(y,x){
              let bomnum = 0;
 
                 around.map(( value, index, array )=>{
-            
+
                     let a = array[index][0];
                     let b = array[index][1];
                     let c = y+a;
@@ -194,51 +143,65 @@ if (req.query.x){
                         if(c>=0 && c<=9 && d>=0 && d<=9){
                             if(board[c][d].hasBom===true){ 
                                 bomnum++;
-                            }
-                            board[y][x].number = bomnum;
-            }     
+                            }   
+                        }          
+              });
+              return bomnum;
+    }
+
+
+
+    // ★爆発判定処理★
+    let count = 0; // もしどこかでexploded: trueになったときにカウントされる
+
+    // 開いた座標に爆弾があるか確認
+    BomPosition.map(( value, index, arr )=>{
+        // 旗が設置してあったときの処理
+        if(board[y][x] == board[arr[index][0]][arr[index][1]] && board[y][x].safeflag==='true'){
+            board[y][x].safeflag = true;  
+        }
+        // 開いた箇所に爆弾があったときの処理
+        if(board[y][x] == board[arr[index][0]][arr[index][1]] && board[y][x].safeflag==='false'){
+            board[y][x].exploded = true;
+            board[y][x].opened = true;
+            count++;
+            delete arr[index];// 開いた座標を配列から削除（その他の誘爆に巻き込まれないため）
+        }
+        //もしどこかでexploded: trueになった場合（カウントが1になった場合）、ほかの爆弾も爆発
+        if(count==1){
+            BomPosition.map(( value, index, arr )=>{
+                board[arr[index][0]][arr[index][1]].exploded = true;
+                board[arr[index][0]][arr[index][1]].opened = false;
+                board[arr[index][0]][arr[index][1]].safeflag = false;
+            })
+            count=0; // カウントを0に戻す
+        }
     });
+
 
 }
 
+// クリアー判定
+    // setInterval(() => {
+    let clearjugde = width*height - 10;
+    let openbox = 0;
 
-
-        // ★爆発判定処理★
-        let count = 0; // もしどこかでexploded: trueになったときにカウントされる
-
-        // 開いた座標に爆弾があるか確認
-        BomPosition.map(( value, index, arr )=>{
-            // 旗が設置してあったときの処理
-            if(board[y][x] == board[arr[index][0]][arr[index][1]] && board[y][x].safeflag==='true'){
-                board[y][x].safeflag = true;  
+    for ( let i=0; i<width; i++){ 
+        for ( let j=0; j<height; j++){ 
+            if(board[i][j].opened == true){
+                openbox++
+                // console.log(openbox,clearjugde);
+                if (openbox == clearjugde){
+                    board[i][j].clear = true
+                }
             }
-            // 開いた箇所に爆弾があったときの処理
-            if(board[y][x] == board[arr[index][0]][arr[index][1]] && board[y][x].safeflag==='false'){
-                board[y][x].exploded = true;
-                board[y][x].opened = true;
-                count++;
-                delete arr[index];// 開いた座標を配列から削除（その他の誘爆に巻き込まれないため）
-            }
-            //もしどこかでexploded: trueになった場合（カウントが1になった場合）、ほかの爆弾も爆発
-            if(count==1){
-                BomPosition.map(( value, index, arr )=>{
-                    board[arr[index][0]][arr[index][1]].exploded = true;
-                    board[arr[index][0]][arr[index][1]].opened = false;
-                    board[arr[index][0]][arr[index][1]].safeflag = false;
-                })
-                count=0; // カウントを0に戻す
-            }
-        });
-
-
+        }
     }
+    // },0)
 
-        
-
-    //    }
     //   配列をコピー
-    let str = JSON.stringify(board);
-    let board2 = JSON.parse(str);
+    let string = JSON.stringify(board);
+    let board2 = JSON.parse(string);
 
    //   hasBomを隠す
     for ( let i=0; i<width; i++){ 
